@@ -1,1 +1,1 @@
-# Schr-dinger-s-Cat
+# Schrödinger's Cat
