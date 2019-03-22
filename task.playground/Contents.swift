@@ -95,7 +95,7 @@ protocol Explosive {
     func detonate () -> Bool
 }
 
-class explosionClass : Explosive{
+class explosiveClass : Explosive{
     func detonate () ->Bool{
         let checker = Int.random(in: 0..<10)
         if(checker < 5){
@@ -116,7 +116,7 @@ protocol Bunker {
     func open()
 }
 
-class bunker: Bunker{
+class bunkerClass: Bunker{
     required init(occupent: Cat, explosive: Explosive) {
         self.occupent = Cat(name: occupent.name, isAlive: nil)
         self.explosive = explosive
@@ -134,7 +134,7 @@ class bunker: Bunker{
         if ExplosionResult == false{
             self.occupent.isAlive = true
         }
-        
+        print(ExplosionResult)
         checkIfTheCatIsAlive(cat: self.occupent)
     }
 
@@ -143,17 +143,17 @@ class bunker: Bunker{
 
 func checkIfTheCatIsAlive(cat: Cat) {
     // TODO: if the cat is alive, print "Its alive!!! 😸"
-    if cat.isAlive == true{
-        print("Its alive!!!")
-    }
-    if cat.isAlive == false{
-        print("Oh no...")
-    }
-    if cat.isAlive == nil{
-        print("Its cat-tum superposition! lol")
-    }
     // TODO: if the cat is dead, print "Oh no 😿"
     // TODO: if the cat is neither alive nor dead, print "Its cat-tum superposition! 🤷‍♂️😼"
+    if cat.isAlive == true{
+        print("Its alive!!! 😸")
+    }
+    if cat.isAlive == false{
+        print("Oh no 😿...")
+    }
+    if cat.isAlive == nil{
+        print("Its cat-tum superposition! 🤷‍♂️😼")
+    }
 }
 
 
@@ -174,9 +174,9 @@ func checkIfTheCatIsAlive(cat: Cat) {
  - Note:  at this point, the cat should be either alive or dead; but not both
  */
 var CopyCat = Cat(name: "Jellie", isAlive: true )
-let TNT = explosionClass()
-let RealBunker: Bunker = bunker(occupent: CopyCat, explosive: TNT)
-RealBunker.open()
+let TNT = explosiveClass()
+let Door: Bunker = bunkerClass(occupent: CopyCat, explosive: TNT)
+Door.open()
 
 /*:
  ### 2.3 Tweaking the Experiment
@@ -194,5 +194,49 @@ protocol DangerousBunker {
     var explosives: [Explosive] { get }
     func open()
 }
+
+class dangerousbunkerClass: DangerousBunker{
+
+    required init(occupent: Cat, explosives: [Explosive]) {
+        self.occupent = Cat(name: occupent.name, isAlive: nil)
+        self.explosives = explosives
+    }
+
+    var occupent: Cat
+
+    var explosives: [Explosive]
+
+    func open() {
+        let explosivesCount = Int.random(in: 1..<11)
+        var explosionReduce = ""
+        
+        for _ in 0..<explosivesCount{
+            self.explosives.append(explosiveClass())
+        }
+        
+        let explosionResult = explosives.map{(explosionClass) -> Bool in explosionClass.detonate()}
+        
+        print("There is \(explosionResult.count) exploives in the room, and result is \(explosionResult).")
+        
+        if explosionResult.contains(true){
+            explosionReduce = explosionResult.reduce("true") {(text, explosionResult) in "\(text)"}
+        }else if explosionResult.contains(false){
+            explosionReduce = explosionResult.reduce("false") {(text, explosionResult) in "\(text)"}
+        }
+        
+        if explosionReduce == "true" {
+            self.occupent.isAlive = false
+            checkIfTheCatIsAlive(cat: occupent)
+        }else if explosionReduce == "false"{
+            self.occupent.isAlive = true
+            checkIfTheCatIsAlive(cat: occupent)
+        }
+    }
+}
+
+var CopyCat2 = Cat(name: "Jellie", isAlive: true )
+var TNT2 = [Explosive]()
+let Door2: DangerousBunker = dangerousbunkerClass(occupent: CopyCat2, explosives: TNT2)
+Door2.open()
 
 //: - Note: Extra points if made use of higher order functions such as `.map` and `.reduce` to make the `open()` function as *functional* as possible
